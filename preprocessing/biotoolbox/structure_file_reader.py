@@ -4,8 +4,6 @@ import re
 
 import Bio
 from Bio import SeqIO
-from Bio.Data.SCOPData import protein_letters_3to1
-
 
 class PdbSeqResDataParser:
     def __init__(self, handle, parser_mode, chain_name, verbose=False):

@@ -1,6 +1,5 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 
 import networkx as nx
@@ -150,7 +149,7 @@ def write_output_files(fname, pdb2go, go2info, pdb2seq):
         if num > 49 and num <= 5000:
             selected_goterms[namespace].add(goterm)
             selected_proteins = selected_proteins.union(prots)
-    """
+    
     for chain in pdb2go:
         goterms = set(pdb2go[chain]['goterms'])
         if len(goterms) > 2 and chain in pdb2seq:
@@ -161,7 +160,7 @@ def write_output_files(fname, pdb2go, go2info, pdb2seq):
                 if num > 19 and num <= 5000:
                     selected_goterms[namespace].add(goterm)
                     selected_proteins = selected_proteins.union(prots)
-    """
+    
 
     selected_goterms_list = {ont: list(selected_goterms[ont]) for ont in onts}
     selected_gonames_list = {ont: [go2info[goterm]['goname'] for goterm in selected_goterms_list[ont]] for ont in onts}
@@ -187,9 +186,10 @@ def write_output_files(fname, pdb2go, go2info, pdb2seq):
                 bp_goterms = goterms.intersection(set(selected_goterms_list[onts[1]]))
                 cc_goterms = goterms.intersection(set(selected_goterms_list[onts[2]]))
                 if len(mf_goterms) > 0 or len(bp_goterms) > 0 or len(cc_goterms) > 0:
-                    sequences_list.append(SeqRecord(Seq(pdb2seq[chain], generic_protein), id=chain, description="nrPDB"))
-                    protein_list.append(chain)
-                    tsv_writer.writerow([chain, ','.join(mf_goterms), ','.join(bp_goterms), ','.join(cc_goterms)])
+                    if chain in pdb2seq: 
+                        sequences_list.append(SeqRecord(Seq(pdb2seq[chain]), id=chain, description="nrPDB"))
+                        protein_list.append(chain)
+                        tsv_writer.writerow([chain, ','.join(mf_goterms), ','.join(bp_goterms), ','.join(cc_goterms)])
 
     np.random.seed(1234)
     np.random.shuffle(protein_list)
@@ -221,7 +221,7 @@ def write_output_files(fname, pdb2go, go2info, pdb2seq):
         if len(mf_goterms) > 0 and len(bp_goterms) > 0 and len(cc_goterms) > 0:
             if sum(mf_evidence) > 0 and sum(bp_evidence) > 0 and sum(cc_evidence) > 0:
                 test_list.add(protein_list[i])
-                test_sequences_list.append(SeqRecord(Seq(pdb2seq[protein_list[i]], generic_protein), id=protein_list[i], description="nrPDB_test"))
+                test_sequences_list.append(SeqRecord(Seq(pdb2seq[protein_list[i]]), id=protein_list[i], description="nrPDB_test"))
         i += 1
 
     print ("Total number of test nrPDB=%d" % (len(test_list)))
@@ -247,6 +247,7 @@ if __name__ == "__main__":
 
     annoted_chains = load_pdbs(args.sifts)
     pdb2clust = load_clusters(args.bc)
+
     pdb2seq = read_fasta(args.seqres)
     nr_chains = nr_set(annoted_chains, pdb2clust)
     print ("### nrPDB annotated chains=", len(nr_chains))

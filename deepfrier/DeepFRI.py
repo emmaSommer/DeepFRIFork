@@ -110,6 +110,9 @@ class DeepFRI(object):
     def train(self, train_tfrecord_fn, valid_tfrecord_fn,
               epochs=100, batch_size=64, pad_len=1200, cmap_type='ca', cmap_thresh=10.0, ont='mf', class_weight=None):
 
+        print("\n\n\n\n")
+        print(tf.data.TFRecordDataset('./preprocessing/TFRecords/PDB_GO_train_00-of-30.tfrecords'))
+        print("\n\n\n\n")
         n_train_records = sum(1 for f in glob.glob(train_tfrecord_fn) for _ in tf.data.TFRecordDataset(f))
         n_valid_records = sum(1 for f in glob.glob(valid_tfrecord_fn) for _ in tf.data.TFRecordDataset(f))
         print ("### Training on: ", n_train_records, "contact maps.")

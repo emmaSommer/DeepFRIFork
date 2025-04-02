@@ -1,0 +1,45 @@
+2025-04-02 14:00:03,805 [INFO] ### number of annotated proteins: 1981
+2025-04-02 14:00:09,766 [INFO] ### number of proteins with seqres sequences: 842837
+2025-04-02 14:00:10,836 [INFO] ### number of annotated clusters: 1981
+2025-04-02 14:00:11,095 [INFO] Number of pdbs to be processed=1981
+2025-04-02 14:00:11,102 [INFO] Start with pdb: 1cov
+2025-04-02 14:00:11,772 [INFO] structure container: 1
+2025-04-02 14:00:11,775 [INFO] Failed on pdb: 1COV
+Somehow the final residue list 67 doesn't match the size of the SEQRES seq 68
+2025-04-02 14:00:11,777 [INFO] Start with pdb: 6z7n
+2025-04-02 14:00:20,165 [INFO] structure container: 1
+2025-04-02 14:00:20,166 [INFO] Failed on pdb: 6Z7N
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 266
+2025-04-02 14:00:20,167 [INFO] Start with pdb: 8wgh
+2025-04-02 14:00:25,798 [INFO] structure container: 1
+2025-04-02 14:00:25,799 [INFO] Failed on pdb: 8WGH
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 272
+2025-04-02 14:00:25,800 [INFO] Start with pdb: 8crx
+2025-04-02 14:00:40,101 [INFO] structure container: 1
+2025-04-02 14:00:40,102 [INFO] Failed on pdb: 8CRX
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 68
+2025-04-02 14:00:40,104 [INFO] Start with pdb: 5zgh
+2025-04-02 14:00:43,044 [INFO] structure container: 1
+2025-04-02 14:00:43,045 [INFO] Failed on pdb: 5ZGH
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 188
+2025-04-02 14:00:43,047 [INFO] Start with pdb: 7txa
+2025-04-02 14:00:44,890 [INFO] structure container: 1
+2025-04-02 14:00:44,891 [INFO] Failed on pdb: 7TXA
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 348
+2025-04-02 14:00:44,892 [INFO] Start with pdb: 3j6x
+2025-04-02 14:01:03,506 [INFO] structure container: 1
+2025-04-02 14:01:03,507 [INFO] Failed on pdb: 3J6X
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 186
+2025-04-02 14:01:03,510 [INFO] Start with pdb: 5oqj
+2025-04-02 14:01:09,885 [INFO] structure container: 1
+2025-04-02 14:01:09,888 [INFO] Failed on pdb: 5OQJ
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 641
+2025-04-02 14:01:09,889 [INFO] Start with pdb: 6j3z
+2025-04-02 14:01:16,739 [INFO] structure container: 1
+2025-04-02 14:01:16,740 [INFO] Failed on pdb: 6J3Z
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 207
+2025-04-02 14:01:16,744 [INFO] Start with pdb: 7fej
+2025-04-02 14:01:17,525 [INFO] structure container: 1
+2025-04-02 14:01:17,526 [INFO] Failed on pdb: 7FEJ
+Somehow the final residue list 80 doesn't match the size of the SEQRES seq 212
+2025-04-02 14:01:17,527 [INFO] Start with pdb: 9ki1

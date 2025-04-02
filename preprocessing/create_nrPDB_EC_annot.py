@@ -1,6 +1,5 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 
 import numpy as np
@@ -20,7 +19,8 @@ import csv
 def read_fasta(fn_fasta):
     aa = set(['R', 'X', 'S', 'G', 'W', 'I', 'Q', 'A', 'T', 'V', 'K', 'Y', 'C', 'N', 'L', 'F', 'D', 'M', 'P', 'H', 'E'])
     prot2seq = {}
-    with gzip.open(fn_fasta, "rt") as handle:
+        
+    with open(fn_fasta, "rt") as handle:
         for record in SeqIO.parse(handle, "fasta"):
             seq = str(record.seq)
             prot = record.id
@@ -158,7 +158,7 @@ def write_output_files(fname, pdb2ec, ec2info, pdb2seq, thresh=10):
             ec_numbers = set(pdb2ec[chain])
             ec_numbers = ec_numbers.intersection(selected_ec_numbers)
             if len(ec_numbers) > 0 and chain in pdb2seq:
-                sequences_list.append(SeqRecord(Seq(pdb2seq[chain], generic_protein), id=chain, description="nrPDB"))
+                sequences_list.append(SeqRecord(Seq(pdb2seq[chain]), id=chain, description="nrPDB"))
                 protein_list.append(chain)
                 tsv_writer.writerow([chain, ','.join(ec_numbers)])
 
@@ -176,7 +176,7 @@ def write_output_files(fname, pdb2ec, ec2info, pdb2seq, thresh=10):
         if len(ec_numbers) > 1:
             test_ec_coverage = test_ec_coverage.union(ec_numbers)
             test_list.add(protein_list[i])
-            test_sequences_list.append(SeqRecord(Seq(pdb2seq[protein_list[i]], generic_protein), id=protein_list[i], description="nrPDB_test"))
+            test_sequences_list.append(SeqRecord(Seq(pdb2seq[protein_list[i]]), id=protein_list[i], description="nrPDB_test"))
         i += 1
 
     print ("Total number of test nrPDB=%d" % (len(test_list)))

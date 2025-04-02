@@ -10,6 +10,8 @@ import numpy as np
 import argparse
 import csv
 import os
+import logging
+
 
 
 def make_distance_maps(pdbfile, chain=None, sequence=None):
@@ -19,6 +21,7 @@ def make_distance_maps(pdbfile, chain=None, sequence=None):
     pdb_handle = open(pdbfile, 'r')
     structure_container = build_structure_container_for_pdb(pdb_handle.read(), chain).with_seqres(sequence)
     # structure_container.chains = {chain: structure_container.chains[chain]}
+    logging.info("structure container: " + str(len(structure_container.chains)))
 
     mapper = DistanceMapBuilder(atom="CA", glycine_hack=-1)  # start with CA distances
     ca = mapper.generate_map_for_pdb(structure_container)
@@ -84,7 +87,9 @@ def load_EC_annot(filename):
 def retrieve_pdb(pdb, chain, chain_seqres, pdir):
     pdb_list = PDBList()
     pdb_list.retrieve_pdb_file(pdb, pdir=pdir)
+    logging.info("Start with pdb: " + str(pdb))
     ca, cb = make_distance_maps(pdir + '/' + pdb +'.cif', chain=chain, sequence=chain_seqres)
+    logging.info("Computed distance for pdb: " + str(pdb))
 
     return ca[chain]['contact-map'], cb[chain]['contact-map']
 
@@ -107,15 +112,19 @@ def write_annot_npz(prot, prot2seq=None, out_dir=None):
     Write to *.npz file format.
     """
     pdb, chain = prot.split('-')
+    #logging.info("Processing pdb: " + str(pdb) + " chain: " + str(chain))
     print ('pdb=', pdb, 'chain=', chain)
     try:
         A_ca, A_cb = retrieve_pdb(pdb.lower(), chain, prot2seq[prot], pdir=os.path.join(out_dir, 'tmp_PDB_files_dir'))
+        logging.info("Retrieved pdb: " + str(pdb) + " chain: " + str(chain))
         np.savez_compressed(os.path.join(out_dir, prot),
                             C_alpha=A_ca,
                             C_beta=A_cb,
                             seqres=prot2seq[prot],
                             )
+        logging.info("Saved pdb: " + str(pdb) + " chain: " + str(chain))
     except Exception as e:
+        logging.info("Failed on pdb: " + str(pdb) + '\n' + str(e))
         print (e)
 
 if __name__ == '__main__':
@@ -127,6 +136,12 @@ if __name__ == '__main__':
     parser.add_argument('-bc', type=str, help="Clusters of PDB chains computd by Blastclust.")
     parser.add_argument('-out_dir', type=str, default='./data/annot_pdb_chains_npz/', help="Output directory with distance maps saved in *.npz format.")
     args = parser.parse_args()
+    
+    logging.basicConfig(
+    filename='dist_map_creation.log',  # Log file name
+    level=logging.INFO,        # Minimum level to log
+    format='%(asctime)s [%(levelname)s] %(message)s'
+    )
 
     # load annotations
     prot2goterms = {}
@@ -136,10 +151,12 @@ if __name__ == '__main__':
         else:
             prot2goterms, _, _ = load_GO_annot(args.annot)
         print ("### number of annotated proteins: %d" % (len(prot2goterms)))
+        logging.info("### number of annotated proteins: %d" % (len(prot2goterms)))
 
     # load sequences
     prot2seq = read_fasta(args.seqres)
     print ("### number of proteins with seqres sequences: %d" % (len(prot2seq)))
+    logging.info("### number of proteins with seqres sequences: %d" % (len(prot2seq)))
 
     # load clusters
     pdb2clust = {}
@@ -147,6 +164,7 @@ if __name__ == '__main__':
         pdb2clust = load_clusters(args.bc)
         clusters = set([pdb2clust[prot][0] for prot in prot2goterms])
         print ("### number of annotated clusters: %d" % (len(clusters)))
+        logging.info("### number of annotated clusters: %d" % (len(clusters)))
 
     """
     # extracting unannotated proteins
@@ -163,14 +181,14 @@ if __name__ == '__main__':
     if len(prot2goterms) != 0:
         to_be_processed = to_be_processed.intersection(set(pdb2clust.keys()))
     print ("Number of pdbs to be processed=", len(to_be_processed))
-    print (to_be_processed)
+    logging.info("Number of pdbs to be processed=" + str(len(to_be_processed)))
 
     # process on multiple cpus
     nprocs = args.num_threads
     out_dir = args.out_dir
     import multiprocessing
     nprocs = np.minimum(nprocs, multiprocessing.cpu_count())
-    if nprocs > 4:
+    if False: #nprocs > 4:
         pool = multiprocessing.Pool(processes=nprocs)
         pool.map(partial(write_annot_npz, prot2seq=prot2seq, out_dir=out_dir),
                  to_be_processed)
