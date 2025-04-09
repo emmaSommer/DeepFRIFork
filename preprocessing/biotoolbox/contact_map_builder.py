@@ -1,10 +1,7 @@
 import numpy as np
 from Bio import Align
-#from Bio.Data.SCOPData import protein_letters_3to1
+from Bio.Data.SCOPData import protein_letters_3to1
 from Bio.SeqUtils import seq1
-from Bio.SeqUtils import IUPACData  # <-- Use IUPACData instead of SCOPData
-
-import logging
 
 TEN_ANGSTROMS     = 10.0
 ALIGNED_BY_SEQRES = 'aligned by SEQRES'
@@ -37,7 +34,7 @@ class ContactMapContainer:
 
 def correct_residue(x, target):
     try:
-        sl = IUPACData.protein_letters_3to1[x.resname]
+        sl = protein_letters_3to1[x.resname]
         if sl == target:
             return True
         return False
@@ -49,7 +46,7 @@ class DistanceMapBuilder:
     def __init__(self,
                  atom="CA",
                  verbose=True,
-                 pedantic=False,
+                 pedantic=True,
                  glycine_hack=-1):
 
         self.verbose = verbose
@@ -82,19 +79,15 @@ class DistanceMapBuilder:
         contact_maps = ContactMapContainer()
         model        = structure_container.structure[0]
 
-        counter = 0
         for chain_name in structure_container.chains:
-            counter += 1
             chain = structure_container.chains[chain_name]
             contact_maps.with_chain(chain_name)
             self.speak(f"\nProcessing chain {chain_name}")
-            #assert False
-#            logging.info(f"\nProcessing chain {counter}: {chain_name}")
 
             if chain['seqres-seq'] is not None and len(chain['seqres-seq']) > 0:
                 contact_maps.with_method_for_chain(chain_name, ALIGNED_BY_SEQRES)
                 seqres_seq = chain['seqres-seq']
-                atom_seq  = chain['atom-seq']
+                atom_seq   = chain['atom-seq']
 
                 alignment = aligner.align(seqres_seq, atom_seq)
                 specific_alignment = next(alignment)
@@ -117,7 +110,6 @@ class DistanceMapBuilder:
                 picked_residues = 0
                 non_canonicals_or_het = 0
 
-                logging.info('aligned atom seq: ' + str(len(aligned_atom_seq)) + '\n' + str(aligned_atom_seq))
                 for i in range(len(aligned_atom_seq)):
                     if aligned_seqres_seq[i] == '-':
                         # This is an inserted residue from the aligner that doesn't actually match any
@@ -144,7 +136,7 @@ class DistanceMapBuilder:
                 final_seq_three_letter_codes = ''.join(
                     [r.resname if r is not None else 'XXX' for r in final_residue_list])
                 final_seq_one_letter_codes = seq1(final_seq_three_letter_codes, undef_code='-',
-                                                  custom_map=IUPACData.protein_letters_3to1)
+                                                  custom_map=protein_letters_3to1)
                 self.speak(f"Final [len of seq {len(seqres_seq)}] [len of result {len(final_seq_one_letter_codes)}] "
                            f"[len of final residue list {len(final_residue_list)}]:\n{final_seq_one_letter_codes}")
 
@@ -200,7 +192,7 @@ class DistanceMapBuilder:
                 final_seq_three_letter_codes = ''.join(
                     [r.resname if r is not None else 'XXX' for r in final_residue_list])
                 final_seq_one_letter_codes = seq1(final_seq_three_letter_codes, undef_code='-',
-                                                  custom_map=IUPACData.protein_letters_3to1)
+                                                  custom_map=protein_letters_3to1)
                 print(final_seq_one_letter_codes)
                 corrected_atom_seq = final_seq_one_letter_codes
                 # End sanity checks
@@ -227,6 +219,7 @@ class DistanceMapBuilder:
         # normalize adjacency matrices
         d = np.diag(d)
         A = d.dot(A.dot(d))
+
         return A
 
     def __create_adj(self, _A, thresh):
@@ -237,6 +230,7 @@ class DistanceMapBuilder:
             A[A > thresh] = 0.0
             A[np.isnan(A)] = 0.0
             A = self.__norm_adj(A)
+
         return A
 
     def __calc_residue_dist(self, residue_one, residue_two):
@@ -248,10 +242,10 @@ class DistanceMapBuilder:
                                     residue_two, self.atom)
         except KeyError:
             if self.atom == "CB":
-                if self.glycine_hack < 0:  # CA-mode for CB+GLY
+                if self.glycine_hack < 0: # CA-mode for CB+GLY
                     try:
-                        dist = self.__euclidean(residue_one, 'CA',
-                                                residue_two, 'CA')
+                        dist = self.__euclidean(residue_one,'CA',
+                                                residue_two,'CA')
                     except KeyError:
                         dist = KEY_NOT_FOUND
                 else:
@@ -263,6 +257,7 @@ class DistanceMapBuilder:
     def __euclidean(self, res1, atom1, res2, atom2):
         diff = res1[atom1] - res2[atom2]
         return np.sqrt(np.sum(diff * diff))
+
 
     def __diagnolize_to_fill_gaps(self, distance_matrix, length):
         # Create CMAP from distance
@@ -278,6 +273,7 @@ class DistanceMapBuilder:
                     A[i][i + 1] = 1.0
                 except IndexError:
                     pass
+
         return A
 
     def __calc_dist_matrix(self, chain_one):
