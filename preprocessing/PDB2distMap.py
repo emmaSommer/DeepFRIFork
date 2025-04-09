@@ -188,10 +188,13 @@ if __name__ == '__main__':
     out_dir = args.out_dir
     import multiprocessing
     nprocs = np.minimum(nprocs, multiprocessing.cpu_count())
+    counter = 0
     if False: #nprocs > 4:
         pool = multiprocessing.Pool(processes=nprocs)
         pool.map(partial(write_annot_npz, prot2seq=prot2seq, out_dir=out_dir),
                  to_be_processed)
     else:
         for prot in to_be_processed:
+            counter += 1
+            logging.info("Processing prot: " + str(counter))
             write_annot_npz(prot, prot2seq=prot2seq, out_dir=out_dir)

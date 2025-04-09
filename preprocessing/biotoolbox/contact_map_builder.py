@@ -75,6 +75,58 @@ class DistanceMapBuilder:
     @property
     def atom(self):
         return self.__atom
+    
+    def _get_alignment_split(self, alignment_text):
+        lines = [line for line in alignment_text.split('\n') if line.strip()]
+
+        # Prepare lists to accumulate the segments from each block
+        target_lines = []
+        middle_lines = []
+        query_lines = []
+
+        # 2) Step through lines in blocks of three
+        for i in range(0, len(lines), 3):
+            # Each block has:
+            #   lines[i]   -> target line (e.g. "target 0 EWLPGNPRPSYLD 14")
+            #   lines[i+1] -> middle line (e.g. "0 |||||||||||||| 14")
+            #   lines[i+2] -> query line  (e.g. "query  0 EWLPGNPRPSYLD 14")
+            
+            target_line = lines[i].strip()
+            mid_line    = lines[i+1].strip()
+            query_line  = lines[i+2].strip()
+            
+            # 3) Extract sequence parts from the line splits.
+            #    Typically, the line is something like:
+            #       "target           0 EWLPGNPRPSYLD 14"
+            #    after splitting on whitespace, we might get:
+            #       ["target", "0", "EWLPGNPRPSYLD", "14"]
+            #    so index 2 is the main sequence chunk; index 3 is the trailing coordinate.
+
+            # --- target line ---
+            tparts = target_line.split()
+            if len(tparts) >= 3:
+                target_seq = tparts[2]  # "EWLPGNPRPSYLD" in the example
+                target_lines.append(target_seq)
+            
+            # --- middle line ---
+            mparts = mid_line.split()
+            # Format might be something like ["0", "||||||||||||", "14"]
+            # so index 1 is the string of bars/spaces
+            if len(mparts) >= 2:
+                middle_seq = mparts[1]
+                middle_lines.append(middle_seq)
+            
+            # --- query line ---
+            qparts = query_line.split()
+            if len(qparts) >= 3:
+                query_seq = qparts[2]
+                query_lines.append(query_seq)
+
+        # 4) Finally, join everything together for each row
+        target_str = "".join(target_lines)
+        middle_str = "".join(middle_lines)
+        query_str  = "".join(query_lines)
+        return target_str, middle_str, query_str
 
     def generate_map_for_pdb(self, structure_container):
 
@@ -102,19 +154,20 @@ class DistanceMapBuilder:
 
                 # It's actually much easier to just have biopython generate the string alignment
                 # and use that as a guide.
-                logging.info("Alignment: " + str(alignment))
-                logging.info("Specific alignment: " + str(specific_alignment))
+                #logging.info("Alignment: " + str(alignment))
+                #logging.info("Specific alignment: \n" + str(specific_alignment))
+                
                 
                 #pattern = specific_alignment.__str__().split("\n")
                 pattern = [line for line in specific_alignment.__str__().splitlines() if line.strip()]
-
                 
-                aligned_seqres_seq, mask, aligned_atom_seq = pattern[:3]
+                #aligned_seqres_seq, mask, aligned_atom_seq = pattern[:3]
+                aligned_seqres_seq, mask, aligned_atom_seq = self._get_alignment_split(specific_alignment.__str__())
                 
-                logging.info("Pattern: " + str(pattern))
-                logging.info("Aligned seqres_seq: " + str(aligned_seqres_seq))
-                logging.info("Aligned mask: " + str(mask))
-                logging.info("Aligned aligned_atom_seq: " + str(aligned_atom_seq))
+                #logging.info("Pattern: " + str(pattern))
+                #logging.info("Aligned seqres_seq: " + str(aligned_seqres_seq))
+                #logging.info("Aligned mask: " + str(mask))
+                #logging.info("Aligned aligned_atom_seq: " + str(aligned_atom_seq))
 
                 # Build a list of residues that we do have atoms for.
                 residues           = model[chain_name].get_residues()
