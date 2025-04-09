@@ -1,7 +1,10 @@
 import numpy as np
 from Bio import Align
-from Bio.Data.SCOPData import protein_letters_3to1
+#from Bio.Data.SCOPData import protein_letters_3to1
 from Bio.SeqUtils import seq1
+from Bio.SeqUtils import IUPACData
+
+import logging
 
 TEN_ANGSTROMS     = 10.0
 ALIGNED_BY_SEQRES = 'aligned by SEQRES'
@@ -34,7 +37,7 @@ class ContactMapContainer:
 
 def correct_residue(x, target):
     try:
-        sl = protein_letters_3to1[x.resname]
+        sl = IUPACData.protein_letters_3to1[x.resname]
         if sl == target:
             return True
         return False
@@ -99,8 +102,19 @@ class DistanceMapBuilder:
 
                 # It's actually much easier to just have biopython generate the string alignment
                 # and use that as a guide.
-                pattern = specific_alignment.__str__().split("\n")
+                logging.info("Alignment: " + str(alignment))
+                logging.info("Specific alignment: " + str(specific_alignment))
+                
+                #pattern = specific_alignment.__str__().split("\n")
+                pattern = [line for line in specific_alignment.__str__().splitlines() if line.strip()]
+
+                
                 aligned_seqres_seq, mask, aligned_atom_seq = pattern[:3]
+                
+                logging.info("Pattern: " + str(pattern))
+                logging.info("Aligned seqres_seq: " + str(aligned_seqres_seq))
+                logging.info("Aligned mask: " + str(mask))
+                logging.info("Aligned aligned_atom_seq: " + str(aligned_atom_seq))
 
                 # Build a list of residues that we do have atoms for.
                 residues           = model[chain_name].get_residues()
@@ -136,7 +150,7 @@ class DistanceMapBuilder:
                 final_seq_three_letter_codes = ''.join(
                     [r.resname if r is not None else 'XXX' for r in final_residue_list])
                 final_seq_one_letter_codes = seq1(final_seq_three_letter_codes, undef_code='-',
-                                                  custom_map=protein_letters_3to1)
+                                                  custom_map=IUPACData.protein_letters_3to1)
                 self.speak(f"Final [len of seq {len(seqres_seq)}] [len of result {len(final_seq_one_letter_codes)}] "
                            f"[len of final residue list {len(final_residue_list)}]:\n{final_seq_one_letter_codes}")
 
@@ -192,7 +206,7 @@ class DistanceMapBuilder:
                 final_seq_three_letter_codes = ''.join(
                     [r.resname if r is not None else 'XXX' for r in final_residue_list])
                 final_seq_one_letter_codes = seq1(final_seq_three_letter_codes, undef_code='-',
-                                                  custom_map=protein_letters_3to1)
+                                                  custom_map=IUPACData.protein_letters_3to1)
                 print(final_seq_one_letter_codes)
                 corrected_atom_seq = final_seq_one_letter_codes
                 # End sanity checks

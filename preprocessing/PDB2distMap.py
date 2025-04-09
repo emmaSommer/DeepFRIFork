@@ -124,7 +124,7 @@ def write_annot_npz(prot, prot2seq=None, out_dir=None):
                             )
         logging.info("Saved pdb: " + str(pdb) + " chain: " + str(chain))
     except Exception as e:
-        logging.info("Failed on pdb: " + str(pdb) + '\n' + str(e.with_traceback))
+        logging.exception("Failed on pdb: " + str(pdb) + '\n' + str(e))
         print (e)
 
 if __name__ == '__main__':
