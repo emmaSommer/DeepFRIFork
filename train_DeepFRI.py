@@ -9,6 +9,7 @@ from deepfrier.DeepFRI import DeepFRI
 from deepfrier.utils import seq2onehot
 from deepfrier.utils import load_GO_annot, load_EC_annot
 
+DATA_DIR = './../data/deepFriData/'
 
 if __name__ == "__main__":
     # Training settings
@@ -28,10 +29,10 @@ if __name__ == "__main__":
     parser.add_argument('--cmap_type', type=str, default='ca', choices=['ca', 'cb'], help="Contact maps type.")
     parser.add_argument('--cmap_thresh', type=float, default=10.0, help="Distance cutoff for thresholding contact maps.")
     parser.add_argument('--model_name', type=str, default='GCN-PDB_MF', help="Name of the GCN model.")
-    parser.add_argument('--train_tfrecord_fn', type=str, default="./preprocessing/TFRecords/PDB_GO_train", help="Train tfrecords.")
-    parser.add_argument('--valid_tfrecord_fn', type=str, default="./preprocessing/TFRecords/PDB_GO_valid", help="Valid tfrecords.")
-    parser.add_argument('--annot_fn', type=str, default="./preprocessing/data/nrPDB-GO_annot.tsv", help="File (*tsv) with GO term annotations.")
-    parser.add_argument('--test_list', type=str, default="./preprocessing/data/nrPDB-GO_test.csv", help="File with test PDB chains.")
+    parser.add_argument('--train_tfrecord_fn', type=str, default=DATA_DIR+"TFRecords/PDB_GO_train", help="Train tfrecords.")
+    parser.add_argument('--valid_tfrecord_fn', type=str, default=DATA_DIR+"TFRecords/PDB_GO_valid", help="Valid tfrecords.")
+    parser.add_argument('--annot_fn', type=str, default=DATA_DIR+"nrPDB-GO_annot.tsv", help="File (*tsv) with GO term annotations.")
+    parser.add_argument('--test_list', type=str, default=DATA_DIR+"nrPDB-GO_test.csv", help="File with test PDB chains.")
 
     args = parser.parse_args()
     print (args)

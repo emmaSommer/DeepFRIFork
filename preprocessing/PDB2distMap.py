@@ -189,7 +189,7 @@ if __name__ == '__main__':
     import multiprocessing
     nprocs = np.minimum(nprocs, multiprocessing.cpu_count())
     counter = 0
-    if False: #nprocs > 4:
+    if nprocs > 4:
         pool = multiprocessing.Pool(processes=nprocs)
         pool.map(partial(write_annot_npz, prot2seq=prot2seq, out_dir=out_dir),
                  to_be_processed)
