@@ -4,38 +4,38 @@ DATA_DIR=./../../data/deepFriData
 TFR_DIR=./../../data/deepFriData/TFRecords
 SEQ_SIM=95
 
-#mkdir $DATA_DIR
-#printf "\n\n  DATA DIRECTORY (%s) CREATED!\n" $DATA_DIR
+mkdir $DATA_DIR
+printf "\n\n  DATA DIRECTORY (%s) CREATED!\n" $DATA_DIR
 
-#printf "\n\n  DOWNLOADING SIFTS-GO DATA...\n"
-#wget ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/pdb_chain_go.tsv.gz -O $DATA_DIR/pdb_chain_go.tsv.gz
+printf "\n\n  DOWNLOADING SIFTS-GO DATA...\n"
+wget ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/pdb_chain_go.tsv.gz -O $DATA_DIR/pdb_chain_go.tsv.gz
 
-#printf "\n\n  DOWNLOADING SIFTS-EC DATA...\n"
-#wget ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/pdb_chain_enzyme.tsv.gz -O $DATA_DIR/pdb_chain_enzyme.tsv.gz
+printf "\n\n  DOWNLOADING SIFTS-EC DATA...\n"
+wget ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/pdb_chain_enzyme.tsv.gz -O $DATA_DIR/pdb_chain_enzyme.tsv.gz
 
-#printf "\n\n  DOWNLOADING PDB SEQRES SEQUENCES...\n"
-#wget https://files.wwpdb.org/pub/pdb/derived_data/pdb_seqres.txt -O $DATA_DIR/pdb_seqres.txt
+printf "\n\n  DOWNLOADING PDB SEQRES SEQUENCES...\n"
+wget https://files.wwpdb.org/pub/pdb/derived_data/pdb_seqres.txt -O $DATA_DIR/pdb_seqres.txt
 
-#printf "\n\n  DOWNLOADING PDB CLUSTERS...\n"
-#wget 	https://cdn.rcsb.org/resources/sequence/clusters/clusters-by-entity-$SEQ_SIM.txt -O $DATA_DIR/bc-$SEQ_SIM.out
+printf "\n\n  DOWNLOADING PDB CLUSTERS...\n"
+wget 	https://cdn.rcsb.org/resources/sequence/clusters/clusters-by-entity-$SEQ_SIM.txt -O $DATA_DIR/bc-$SEQ_SIM.out
 
-#printf "\n\n  DOWNLOADING GO HIERARCHY...\n"
-#wget http://purl.obolibrary.org/obo/go/go-basic.obo -O $DATA_DIR/go-basic.obo
+printf "\n\n  DOWNLOADING GO HIERARCHY...\n"
+wget http://purl.obolibrary.org/obo/go/go-basic.obo -O $DATA_DIR/go-basic.obo
 
-#printf "\n\n  PREPROCESSING GO-ANNOTATIONS [Please wait this process may take a few minutes]...\n"
-#python create_nrPDB_GO_annot.py \
-#    -sifts $DATA_DIR/pdb_chain_go.tsv.gz \
-#    -bc $DATA_DIR/bc-$SEQ_SIM.out \
-#    -seqres $DATA_DIR/pdb_seqres.txt \
-#    -obo $DATA_DIR/go-basic.obo \
-#    -out $DATA_DIR/nrPDB-GO \
+printf "\n\n  PREPROCESSING GO-ANNOTATIONS [Please wait this process may take a few minutes]...\n"
+python create_nrPDB_GO_annot.py \
+    -sifts $DATA_DIR/pdb_chain_go.tsv.gz \
+    -bc $DATA_DIR/bc-$SEQ_SIM.out \
+    -seqres $DATA_DIR/pdb_seqres.txt \
+    -obo $DATA_DIR/go-basic.obo \
+    -out $DATA_DIR/nrPDB-GO \
 
-#printf "\n\n  PREPROCESSING EC-ANNOTATIONS [Please wait this process may take a few minutes]...\n"
-#python create_nrPDB_EC_annot.py \
-#    -sifts $DATA_DIR/pdb_chain_enzyme.tsv.gz \
-#    -bc $DATA_DIR/bc-$SEQ_SIM.out \
-#    -seqres $DATA_DIR/pdb_seqres.txt \
-#    -out $DATA_DIR/nrPDB-EC \
+printf "\n\n  PREPROCESSING EC-ANNOTATIONS [Please wait this process may take a few minutes]...\n"
+python create_nrPDB_EC_annot.py \
+    -sifts $DATA_DIR/pdb_chain_enzyme.tsv.gz \
+    -bc $DATA_DIR/bc-$SEQ_SIM.out \
+    -seqres $DATA_DIR/pdb_seqres.txt \
+    -out $DATA_DIR/nrPDB-EC \
 
 printf "\n\n  RETRIEVING PDB FILES AND CREATING DISTANCE MAPS...\n"
 mkdir $DATA_DIR/annot_pdb_chains_npz/

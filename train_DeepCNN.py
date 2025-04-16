@@ -24,10 +24,10 @@ if __name__ == "__main__":
     parser.add_argument('-ont', '--ontology', type=str, default='mf', choices=['mf', 'bp', 'cc', 'ec'], help="Ontology.")
     parser.add_argument('--model_name', type=str, default='CNN-PDB_MF', help="Name of the CNN model.")
     parser.add_argument('-lm', '--lm_model_name', type=str, help="Path to the pretraned LSTM-Language Model.")
-    parser.add_argument('--train_tfrecord_fn', type=str, default="/mnt/ceph/users/vgligorijevic/ContactMaps/TFRecords/PDB_GO_train", help="Train tfrecords.")
-    parser.add_argument('--valid_tfrecord_fn', type=str, default="/mnt/ceph/users/vgligorijevic/ContactMaps/TFRecords/PDB_GO_valid", help="Valid tfrecords.")
-    parser.add_argument('--annot_fn', type=str, default="./preprocessing/data/nrPDB-GO_2019.06.18_annot.tsv", help="File (*tsv) with GO term annotations.")
-    parser.add_argument('--test_list', type=str, default="./preprocessing/data/nrPDB-GO_2019.06.18_test.csv", help="File with test PDB chains.")
+    parser.add_argument('--train_tfrecord_fn', type=str, default="./../../data/deepFriData/TFRecords/PDB_GO_train", help="Train tfrecords.")
+    parser.add_argument('--valid_tfrecord_fn', type=str, default="./../../data/deepFriData/TFRecords/PDB_GO_valid", help="Valid tfrecords.")
+    parser.add_argument('--annot_fn', type=str, default="./preprocessing/data/nrPDB-GO_annot.tsv", help="File (*tsv) with GO term annotations.")
+    parser.add_argument('--test_list', type=str, default="./preprocessing/data/nrPDB-GO_test.csv", help="File with test PDB chains.")
 
     args = parser.parse_args()
     print (args)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     Y_pred = []
     Y_true = []
     proteins = []
-    path = '/mnt/home/vgligorijevic/Projects/NewMethods/Contact_maps/DeepFRIer2/preprocessing/data/annot_pdb_chains_npz/'
+    path = './../../data/deepFriData/annot_pdb_chains_npz/'
     with open(args.test_list, mode='r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader, None)  # header

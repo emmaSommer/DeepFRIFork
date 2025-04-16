@@ -179,15 +179,15 @@ class GenerateTFRecord(object):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-annot', type=str, default='./data/nrPDB-GO_2020.06.18_annot.tsv', help="Input file (*.tsv) with preprocessed annotations.")
+    parser.add_argument('-annot', type=str, default='./data/nrPDB-GO_annot.tsv', help="Input file (*.tsv) with preprocessed annotations.")
     parser.add_argument('-ec', help="Use EC annotations.", action="store_true")
-    parser.add_argument('-prot_list', type=str, default='./data/nrPDB-GO_2019.06.18_train.txt',
+    parser.add_argument('-prot_list', type=str, default='./data/nrPDB-GO_train.txt',
                         help="Input file (*.txt) with a set of protein IDs with distMAps in npz_dir.")
     parser.add_argument('-npz_dir', type=str, default='./data/annot_pdb_chains_npz/',
                         help="Directory with distance maps saved in *.npz format to be loaded.")
     parser.add_argument('-num_threads', type=int, default=20, help="Number of threads (CPUs) to use in the computation.")
     parser.add_argument('-num_shards', type=int, default=20, help="Number of tfrecord files per protein set.")
-    parser.add_argument('-tfr_prefix', type=str, default='/mnt/ceph/users/vgligorijevic/ContactMaps/TFRecords/PDB_GO_train',
+    parser.add_argument('-tfr_prefix', type=str, default='./../../data/deepFriData/TFRecords/PDB_GO_train',
                         help="Directory with tfrecord files for model training.")
     args = parser.parse_args()
 

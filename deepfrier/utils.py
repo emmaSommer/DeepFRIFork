@@ -235,7 +235,7 @@ def get_batched_dataset(filenames, batch_size=64, pad_len=1000, n_goterms=347, c
     return dataset
 
 
-def load_catalogue(fn='/mnt/home/dberenberg/ceph/SWISSMODEL_CONTACTMAPS/catalogue.csv'):
+def load_catalogue(fn='examples/catalogue_pdb_chains.csv'):
     chain2path = {}
     with open(fn) as tsvfile:
         fRead = csv.reader(tsvfile, delimiter=',')
@@ -253,6 +253,6 @@ if __name__ == "__main__":
     # from DeepFRI import DeepFRI
     # model = DeepFRI(output_dim=489)
 
-    filenames = '/mnt/ceph/users/vgligorijevic/ContactMaps/TFRecords/PDB_GO_valid*'
+    filenames = './../../data/deepFriData/TFRecords/PDB_GO_valid*'
     n_records = sum(1 for f in glob.glob(filenames) for _ in tf.data.TFRecordDataset(f))
     print ("### Total number of samples=", n_records)

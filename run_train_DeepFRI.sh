@@ -9,18 +9,18 @@ fully_connected_dims="1024"
 graph_conv_layer=GraphConv
 ontology=ec
 cmap_thresh=10.0
-data_dir=/mnt/ceph/users/vgligorijevic/ContactMaps/TFRecords/
+data_dir=./../../data/deepFriData/TFRecords
 cmap_data=PDB # possible: PDB, SWISS-MODEL or MERGED
 model_name=./results/DeepFRI-${cmap_data}_${graph_conv_layer}_gcd_$(echo $graph_conv_dims | tr ' ' '-')_fcd_${fully_connected_dims}_ca_${cmap_thresh}_${ontology}
 
 if [ "$ontology" == ec ]; then
     annot=EC
-    annot_fn=./preprocessing/data/nrPDB-EC_2020.04_annot.tsv
-    test_list=./preprocessing/data/nrPDB-EC_2020.04_test.csv
+    annot_fn=./preprocessing/data/nrPDB-EC_annot.tsv
+    test_list=./preprocessing/data/nrPDB-EC_test.csv
 else
     annot=GO
-    annot_fn=./preprocessing/data/nrPDB-GO_2019.06.18_annot.tsv
-    test_list=./preprocessing/data/nrPDB-GO_2019.06.18_test.csv
+    annot_fn=./preprocessing/data/nrPDB-GO_annot.tsv
+    test_list=./preprocessing/data/nrPDB-GO_test.csv
 fi
 
 if [ "$cmap_data" == MERGED ]; then

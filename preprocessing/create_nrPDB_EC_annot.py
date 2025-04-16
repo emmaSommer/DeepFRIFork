@@ -198,7 +198,7 @@ if __name__ == "__main__":
     parser.add_argument('-sifts', type=str, default='./data/pdb_chain_enzyme.tsv.gz', help="SIFTS annotation files.")
     parser.add_argument('-bc', type=str, default='./data/bc-95.out', help="Blastclust of PDB chains.")
     parser.add_argument('-seqres', type=str, default='./data/pdb_seqres.txt.gz', help="PDB chain seqres fasta.")
-    parser.add_argument('-out', type=str, default='./data/nrPDB-EC_2020.04', help="Output filename prefix.")
+    parser.add_argument('-out', type=str, default='./data/nrPDB-EC', help="Output filename prefix.")
     args = parser.parse_args()
 
     annoted_chains = load_pdbs(args.sifts)

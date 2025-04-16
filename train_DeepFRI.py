@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import pickle
 
 import argparse
@@ -21,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('-lr', type=float, default=0.0002, help="Initial learning rate.")
     parser.add_argument('-gc', '--gc_layer', type=str, choices=['GraphConv', 'MultiGraphConv', 'SAGEConv', 'ChebConv', 'GAT', 'NoGraphConv'],
                         help="Graph Conv layer.")
-    parser.add_argument('-e', '--epochs', type=int, default=200, help="Number of epochs to train.")
+    parser.add_argument('-e', '--epochs', type=int, default=100, help="Number of epochs to train.")
     parser.add_argument('-bs', '--batch_size', type=int, default=64, help="Batch size.")
     parser.add_argument('-pd', '--pad_len', type=int, help="Padd length (max len of protein sequences in train set).")
     parser.add_argument('-ont', '--ontology', type=str, default='mf', choices=['mf', 'bp', 'cc', 'ec'], help="Ontology.")
@@ -80,13 +81,22 @@ if __name__ == "__main__":
     Y_pred = []
     Y_true = []
     proteins = []
-    path = '/mnt/home/vgligorijevic/Projects/NewMethods/Contact_maps/DeepFRIer2/preprocessing/data/annot_pdb_chains_npz/'
+    path = './../../data/deepFriData/annot_pdb_chains_npz/'
     with open(args.test_list, mode='r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader, None)  # header
         for row in csv_reader:
             prot = row[0]
-            cmap = np.load(path + prot + '.npz')
+            
+            file_path = path + prot + '.npz'
+
+            if not os.path.exists(file_path):
+                print(f"File not found: {file_path}")
+                continue
+            
+            cmap = np.load(file_path)
+            
+            # ./../../data/deepFriData/annot_pdb_chains_npz/3ONG-B.npz'
             sequence = str(cmap['seqres'])
             Ca_dist = cmap['C_alpha']
 
