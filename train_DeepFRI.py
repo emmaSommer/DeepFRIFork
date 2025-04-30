@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser.add_argument('--train_tfrecord_fn', type=str, default=DATA_DIR+"TFRecords/PDB_GO_train", help="Train tfrecords.")
     parser.add_argument('--valid_tfrecord_fn', type=str, default=DATA_DIR+"TFRecords/PDB_GO_valid", help="Valid tfrecords.")
     parser.add_argument('--annot_fn', type=str, default=DATA_DIR+"nrPDB-GO_annot.tsv", help="File (*tsv) with GO term annotations.")
-    parser.add_argument('--test_list', type=str, default=DATA_DIR+"nrPDB-GO_test.csv", help="File with test PDB chains.")
+    parser.add_argument('--test_list', type=str, default=DATA_DIR+"nrPDB-GO_test.txt", help="File with test PDB chains.")
 
     args = parser.parse_args()
     print (args)
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     Y_pred = []
     Y_true = []
     proteins = []
-    path = './../../data/deepFriData/annot_pdb_chains_npz/'
+    path = './../data/deepFriData/annot_pdb_chains_npz/'
     with open(args.test_list, mode='r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader, None)  # header
