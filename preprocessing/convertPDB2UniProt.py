@@ -8,6 +8,7 @@ import requests
 from Bio.PDB import PDBParser
 from io import StringIO
 
+OUT_DATA_DIR = './../../data/deepFriData/alphafold/'
 
 def get_uniprot_from_pdb_chain(pdb_id, chain_id):
     url = f'https://www.ebi.ac.uk/pdbe/api/mappings/uniprot/{pdb_id.lower()}'
@@ -24,8 +25,8 @@ def get_uniprot_from_pdb_chain(pdb_id, chain_id):
 
 def download_alphafold_npz(uniprot_id, output_dir="alphafold_npz"):
     url = f"https://ftp.ebi.ac.uk/pub/databases/alphafold/latest/{uniprot_id}.npz"
-    os.makedirs(output_dir, exist_ok=True)
-    out_path = os.path.join(output_dir, f"{uniprot_id}.npz")
+    os.makedirs(OUT_DATA_DIR + output_dir, exist_ok=True)
+    out_path = os.path.join(OUT_DATA_DIR, output_dir, f"{uniprot_id}.npz")
 
     if os.path.exists(out_path):
         print(f"[✓] {uniprot_id}.npz already downloaded.")
@@ -44,8 +45,8 @@ def download_alphafold_npz(uniprot_id, output_dir="alphafold_npz"):
 def download_alphafold_pdb(uniprot_id, output_dir="alphafold_pdb"):
     # url = f"https://ftp.ebi.ac.uk/pub/databases/alphafold/latest/{uniprot_id}.npz"
     url = f"https://alphafold.ebi.ac.uk/files/AF-{uniprot_id}-F1-model_v4.pdb"
-    os.makedirs(output_dir, exist_ok=True)
-    out_path = os.path.join(output_dir, f"{uniprot_id}.pdb")
+    os.makedirs(OUT_DATA_DIR + output_dir, exist_ok=True)
+    out_path = os.path.join(OUT_DATA_DIR, output_dir, f"{uniprot_id}.pdb")
 
     if os.path.exists(out_path):
         print(f"[✓] {uniprot_id}.pdb already downloaded.")
@@ -92,6 +93,20 @@ def visualize_map(contact_map, title):
     plt.tight_layout()
     plt.show()
 
+def load_pdb_to_uniprot_mapping(file_path):
+    mappings = {}
+    with open(file_path, 'r') as f:
+        lines = [line.strip() for line in f if line.strip()]
+
+    for line in lines:
+        pdb_id, chain = parse_chain_from_line(line)
+        if chain is None:
+            print(f"[!] Chain info missing for {pdb_id}")
+            continue
+        uniprot_id = get_uniprot_from_pdb_chain(pdb_id, chain)
+        mappings[pdb_id+chain] = uniprot_id
+    
+
 def main(input_file):
     mapping_errors = 0
     download_errors = 0
@@ -113,18 +128,18 @@ def main(input_file):
                 continue
 
             contact_map = compute_ca_distance_map(
-                pdb_path = os.path.join('alphafold_pdb', uniprot_id + '.pdb'),
+                pdb_path = os.path.join(OUT_DATA_DIR + 'alphafold_pdb', uniprot_id + '.pdb'),
             )
 
-            os.makedirs('alphafold_contact_maps', exist_ok=True)
+            os.makedirs(OUT_DATA_DIR + 'alphafold_contact_maps', exist_ok=True)
             np.save(
-                os.path.join("alphafold_contact_maps", uniprot_id),
+                os.path.join(OUT_DATA_DIR + "alphafold_contact_maps", uniprot_id),
                 contact_map
             )
-            print(f"[💾] Contact map saved to {os.path.join('alphafold_contact_maps', uniprot_id + '.npz')}")
+            print(f"[💾] Contact map saved to {os.path.join(OUT_DATA_DIR + 'alphafold_contact_maps', uniprot_id + '.npz')}")
         
-            visualize_map(contact_map, f"{uniprot_id}")
-            plt.show()
+#            visualize_map(contact_map, f"{uniprot_id}")
+#            plt.show()
         else:
             print(f"{line} -> UniProt mapping not found")
             mapping_errors += 1
