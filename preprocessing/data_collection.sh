@@ -91,3 +91,10 @@ python PDB2distMap.py \
 #     -num_shards 1 \
 #     -num_threads 1 \
 #     -tfr_prefix $TFR_DIR/PDB_EC_valid \
+
+
+python PDB2TFRecord.py -annot $DATA_DIR/nrPDB-GO_annot.tsv \ -prot_list $DATA_DIR/nrPDB-GO_train.txt \
+#     -npz_dir $DATA_DIR/annot_pdb_chains_npz/ \
+#     -num_shards 30 \
+#     -num_threads 30 \
+#     -tfr_prefix $TFR_DIR/PDB_GO_train \

@@ -1,10 +1,13 @@
 import csv
+import logging
 import os.path
 import argparse
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
 import multiprocessing
+
 
 
 def seq2onehot(seq):
@@ -34,13 +37,14 @@ def load_list(fname):
     for line in fRead:
         pdb_chain_list.append(line.strip())
     fRead.close()
-
+    logging.info("### Number of proteins in the list: " + str(len(pdb_chain_list)))
     return pdb_chain_list
 
 
 def load_GO_annot(filename):
     """ Load GO annotations """
     onts = ['molecular_function', 'biological_process', 'cellular_component']
+    logging.info("### Loading GO annotations from: " + filename)
     prot2annot = {}
     goterms = {ont: [] for ont in onts}
     gonames = {ont: [] for ont in onts}
@@ -73,6 +77,7 @@ def load_GO_annot(filename):
                 goterm_indices = [goterms[onts[i]].index(goterm) for goterm in prot_goterms[i].split(',') if goterm != '']
                 prot2annot[prot][onts[i]] = np.zeros(len(goterms[onts[i]]), dtype=np.int64)
                 prot2annot[prot][onts[i]][goterm_indices] = 1.0
+    logging.info("### Number of proteins with GO annotations: " + str(len(prot2annot)))
     return prot2annot, goterms, gonames
 
 
@@ -105,9 +110,13 @@ class GenerateTFRecord(object):
         self.num_shards = num_shards
 
         shard_size = len(prot_list)//num_shards
+        logging.info("### Shard size: " + str(shard_size))
         indices = [(i*(shard_size), (i+1)*(shard_size)) for i in range(0, num_shards)]
         indices[-1] = (indices[-1][0], len(prot_list))
         self.indices = indices
+        
+        self.FAILED = 0
+        self.TOTAL = 0
 
     def _bytes_feature(self, value):
         """Returns a bytes_list from a string / byte."""
@@ -158,8 +167,12 @@ class GenerateTFRecord(object):
         for i, prot in enumerate(tmp_prot_list):
             if i % 500 == 0:
                 print ("### Iter = %d/%d" % (i, len(tmp_prot_list)))
+                logging.info(str("### Iter = %d/%d" % (i, len(tmp_prot_list))))
             pdb_file = self.npz_dir + '/' + prot + '.npz'
+            self.TOTAL += 1
+            logging.info("Total: " + str(self.TOTAL))
             if os.path.isfile(pdb_file):
+                logging.info("### Loading: " + pdb_file)
                 cmap = np.load(pdb_file)
                 sequence = str(cmap['seqres'])
                 ca_dist_matrix = cmap['C_alpha']
@@ -168,6 +181,9 @@ class GenerateTFRecord(object):
                 example = self._serialize_example(prot, sequence, ca_dist_matrix, cb_dist_matrix)
                 writer.write(example)
             else:
+                logging.info("### Failed to load: " + pdb_file)
+                self.FAILED += 1
+                logging.info("Failed: " + str(self.FAILED))
                 print (pdb_file)
         print ("Writing {} done!".format(tfrecord_fn))
 
@@ -175,6 +191,9 @@ class GenerateTFRecord(object):
         pool = multiprocessing.Pool(processes=num_threads)
         shards = [idx for idx in range(0, self.num_shards)]
         pool.map(self._convert_numpy_folder, shards)
+        logging.info("### Finished writing TFRecords!")
+        logging.info("### Number of failed examples: " + str(self.FAILED))
+        logging.info("### Number of total examples: " + str(self.TOTAL))
 
 
 if __name__ == "__main__":
@@ -190,12 +209,29 @@ if __name__ == "__main__":
     parser.add_argument('-tfr_prefix', type=str, default='./../../data/deepFriData/TFRecords/PDB_GO_train',
                         help="Directory with tfrecord files for model training.")
     args = parser.parse_args()
+    
+    log_file = Path('create_tfrecords_' + args.prot_list.split('/')[-1].split('.')[0] + '.log')
+    if log_file.exists():
+        os.remove(log_file)
+    logging.basicConfig(
+        filename=log_file,  # Log file name
+        level=logging.INFO,        # Minimum level to log
+        format='%(asctime)s [%(levelname)s] %(message)s'
+        )
 
     prot_list = load_list(args.prot_list)
     if args.ec:
         prot2annot, _ = load_EC_annot(args.annot)
     else:
         prot2annot, _, _ = load_GO_annot(args.annot)
-
+    
+    print('Number of protein in list with annotations: ', len(set(prot_list).intersection(set(prot2annot.keys()))))
     tfr = GenerateTFRecord(prot_list, prot2annot, args.ec, args.npz_dir, args.tfr_prefix, num_shards=args.num_shards)
     tfr.run(num_threads=args.num_threads)
+    print ("### Number of failed examples: ", tfr.FAILED)
+    print ("### Number of total examples: ", tfr.TOTAL)
+    #print(f"Failed: {tfr.FAILED / tfr.TOTAL*100:.2}%")
+    #logging.info ("### Number of failed examples: ", tfr.FAILED)
+    
+    #logging.info ("### Number of total examples: ", tfr.TOTAL)
+    #logging.info(f"Failed: {tfr.FAILED / tfr.TOTAL*100:.2}%")
