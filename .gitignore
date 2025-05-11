@@ -19,3 +19,9 @@ results
 trained_models/*
 newest_trained/*
 alphafold2
+
+# generated files
+preprocessing/alphafold_contact_maps
+preprocessing/alphafold_pdb
+
+dist_map*

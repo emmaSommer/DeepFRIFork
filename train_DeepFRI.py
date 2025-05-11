@@ -11,6 +11,7 @@ from deepfrier.utils import seq2onehot
 from deepfrier.utils import load_GO_annot, load_EC_annot
 
 DATA_DIR = './../data/deepFriData/'
+NPZ_DIR = DATA_DIR + 'alphafold/'
 
 if __name__ == "__main__":
     # Training settings
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument('-lr', type=float, default=0.0002, help="Initial learning rate.")
     parser.add_argument('-gc', '--gc_layer', type=str, choices=['GraphConv', 'MultiGraphConv', 'SAGEConv', 'ChebConv', 'GAT', 'NoGraphConv'],
                         help="Graph Conv layer.")
-    parser.add_argument('-e', '--epochs', type=int, default=100, help="Number of epochs to train.")
+    parser.add_argument('-e', '--epochs', type=int, default=10, help="Number of epochs to train.")
     parser.add_argument('-bs', '--batch_size', type=int, default=64, help="Batch size.")
     parser.add_argument('-pd', '--pad_len', type=int, help="Padd length (max len of protein sequences in train set).")
     parser.add_argument('-ont', '--ontology', type=str, default='mf', choices=['mf', 'bp', 'cc', 'ec'], help="Ontology.")
@@ -30,8 +31,8 @@ if __name__ == "__main__":
     parser.add_argument('--cmap_type', type=str, default='ca', choices=['ca', 'cb'], help="Contact maps type.")
     parser.add_argument('--cmap_thresh', type=float, default=10.0, help="Distance cutoff for thresholding contact maps.")
     parser.add_argument('--model_name', type=str, default='GCN-PDB_MF', help="Name of the GCN model.")
-    parser.add_argument('--train_tfrecord_fn', type=str, default=DATA_DIR+"TFRecords/PDB_GO_train", help="Train tfrecords.")
-    parser.add_argument('--valid_tfrecord_fn', type=str, default=DATA_DIR+"TFRecords/PDB_GO_valid", help="Valid tfrecords.")
+    parser.add_argument('--train_tfrecord_fn', type=str, default=NPZ_DIR+"TFRecords/PDB_GO_train", help="Train tfrecords.")
+    parser.add_argument('--valid_tfrecord_fn', type=str, default=NPZ_DIR+"TFRecords/PDB_GO_valid", help="Valid tfrecords.")
     parser.add_argument('--annot_fn', type=str, default=DATA_DIR+"nrPDB-GO_annot.tsv", help="File (*tsv) with GO term annotations.")
     parser.add_argument('--test_list', type=str, default=DATA_DIR+"nrPDB-GO_test.txt", help="File with test PDB chains.")
 
