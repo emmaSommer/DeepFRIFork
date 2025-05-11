@@ -27,21 +27,21 @@ printf "\n\n\t Create npz files from alphafold contact maps"
  printf "\n\tValidation data\n"
  python build_npz_from_alphafold.py \
     --map_dir $DATA_DIR/alphafold_contact_maps \
-    --pdb_dir $DATA_DIR/alphafold_pdbs \
+    --pdb_dir $DATA_DIR/alphafold_pdb \
     --out_dir $NPZ_DIR \
     --pdb_file data/nrPDB-GO_valid.txt
 
  printf "\n\Training data\n"
  python build_npz_from_alphafold.py \
     --map_dir $DATA_DIR/alphafold_contact_maps \
-    --pdb_dir $DATA_DIR/alphafold_pdbs \
+    --pdb_dir $DATA_DIR/alphafold_pdb \
     --out_dir $NPZ_DIR \
     --pdb_file data/nrPDB-GO_train.txt
 
  printf "\n\tTesting data\n"
  python build_npz_from_alphafold.py \
     --map_dir $DATA_DIR/alphafold_contact_maps \
-    --pdb_dir $DATA_DIR/alphafold_pdbs \
+    --pdb_dir $DATA_DIR/alphafold_pdb \
     --out_dir $NPZ_DIR \
     --pdb_file data/nrPDB-GO_test.txt
 
