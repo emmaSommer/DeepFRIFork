@@ -82,6 +82,7 @@ def main(npz_dir, pdb_dir, contact_map_dir, pdb_id_file):
         
         uniprot = uniprot_id                   # “P69905” from “P69905.npy”
         pdb_path = Path(pdb_dir, f'{uniprot}.pdb')
+        print(pdb_path)
         if not pdb_path.exists():
             warnings.warn(f'Skipping {uniprot}: no corresponding PDB found')
             no_pdb += 1

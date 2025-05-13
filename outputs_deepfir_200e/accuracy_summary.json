@@ -1,5 +1,9 @@
 {
-  "test_acc": 0.8678812415654521,
+  "test_acc": 0.8944622117488639,
   "total": 457,
-  "found": 456
+  "found": 457,
+  "test_list": "./../data/deepFriData/nrPDB-GO_test.txt",
+  "no_annot": 0,
+  "no_npz": 0,
+  "no_annot_no_npz": 0
 }

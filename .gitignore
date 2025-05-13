@@ -25,3 +25,4 @@ preprocessing/alphafold_contact_maps
 preprocessing/alphafold_pdb
 
 dist_map*
+*.log

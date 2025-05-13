@@ -41,15 +41,15 @@ def parse_args(npz_folder):
     parser.add_argument('--model_name', type=str, default='GCN_PDB_MF',
                         help="Model name prefix.")
     # data
-    parser.add_argument('--train_tfrecord', type=str, required=True, default=npz_folder+"TFRecords/PDB_GO_train",
+    parser.add_argument('--train_tfrecord', type=str, default=npz_folder+"TFRecords/PDB_GO_train",
                         help="Glob pattern for train TFRecords.")
-    parser.add_argument('--valid_tfrecord', type=str, required=True, default=npz_folder+"TFRecords/PDB_GO_valid",
+    parser.add_argument('--valid_tfrecord', type=str,  default=npz_folder+"TFRecords/PDB_GO_valid",
                         help="Glob pattern for validation TFRecords.")
-    parser.add_argument('--test_tfrecord', type=str, required=True, default=npz_folder+"TFRecords/PDB_GO_test",
+    parser.add_argument('--test_tfrecord', type=str,  default=npz_folder+"TFRecords/PDB_GO_test",
                         help="Glob pattern for validation TFRecords.")
-    parser.add_argument('--annot_fn', type=str, required=True, default=DATA_DIR+"nrPDB-GO_annot.tsv",
+    parser.add_argument('--annot_fn', type=str, default=DATA_DIR+"nrPDB-GO_annot.tsv",
                         help="Annotation TSV file.")
-    parser.add_argument('--test_list', type=str, required=True, default=DATA_DIR+"nrPDB-GO_test.txt",
+    parser.add_argument('--test_list', type=str, default="preprocessing/data/nrPDB-GO_test.txt",
                         help="CSV file with test protein IDs.")
     # output
     parser.add_argument('--output_dir', type=str, default='deepFRI_training',
@@ -65,7 +65,8 @@ def run_pipeline(
     gc_layer='GraphConv', epochs=10, batch_size=64, pad_len=None,
     ontology='mf', lm_model_name=None, cmap_type='ca', cmap_thresh=10.0,
     model_name='GCN_PDB_MF', train_tfrecord="TFRecords/PDB_GO_train", valid_tfrecord="TFRecords/PDB_GO_valid", test_tfrecord="TFRecords/PDB_GO_test",
-    annot_fn=DATA_DIR+"nrPDB-GO_annot.tsv", test_list=DATA_DIR+"nrPDB-GO_test.txt", output_dir='deepFRI_training', data_folder=None
+    annot_fn=DATA_DIR+"nrPDB-GO_annot.tsv", test_list=DATA_DIR+"nrPDB-GO_test.txt", #test_list="preprocessing/data/nrPDB-GO_test.txt",
+    output_dir='deepFRI_training', data_folder=None
 ):
     """
     Programmatic entry: trains and evaluates DeepFRI using specified parameters.
@@ -156,6 +157,10 @@ def evaluate_model(model, prot2annot, output_dim, test_list, args):
     print(test_list)
     total = 0
     found = 0
+    no_annot = 0
+    no_npz = 0
+    no_annot_no_npz = 0
+    print(test_list)
     with open(test_list, 'r') as fh:
         reader = csv.reader(fh)
         next(reader, None)
@@ -163,7 +168,13 @@ def evaluate_model(model, prot2annot, output_dim, test_list, args):
             total += 1
             prot = row[0]
             npz = os.path.join(args.data_folder + '/annot_pdb_chains_npz/' + prot + '.npz')
-            if not os.path.exists(npz):
+            if not os.path.exists(npz) or  prot not in prot2annot:
+                if not os.path.exists(npz) and prot not in prot2annot:
+                    no_annot_no_npz += 1
+                elif not os.path.exists(npz):
+                    no_npz += 1
+                elif prot not in prot2annot:
+                    no_annot += 1
                 continue
             found += 1
             data = np.load(npz)
@@ -193,7 +204,8 @@ def evaluate_model(model, prot2annot, output_dim, test_list, args):
     with open(os.path.join(args.output_dir, args.model_name + '_results.pckl'), 'wb') as pf:
         pickle.dump(results, pf)
     # store accuracy summary
-    summary = {'test_acc': acc, 'total': total, 'found': found}
+    summary = {'test_acc': acc, 'total': total, 'found': found, 'test_list': test_list,
+               'no_annot': no_annot, 'no_npz': no_npz, 'no_annot_no_npz': no_annot_no_npz}
     with open(os.path.join(args.output_dir, 'accuracy_summary.json'), 'w') as af:
         json.dump(summary, af, indent=2)
     print(f"Test accuracy: {acc:.4f}")
